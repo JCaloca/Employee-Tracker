@@ -4,12 +4,15 @@ const cTable = require("console.table");
 const { exit } = require("process");
 
 // Creating connection to database
-const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "company_db",
-});
+const db = mysql.createConnection(
+  {
+    host: "localhost",
+    user: "root",
+    password: "Rucais1stinkydog!",
+    database: "company_db",
+  },
+  console.log(`Connected to the company_db database.`)
+);
 
 // TODO: Add inquirer questions for first prompt
 const initialPrompt = () => {
@@ -54,17 +57,27 @@ const initialPrompt = () => {
 };
 
 // TODO: add function/ prompt for view all departments
-
+const viewDepartments = () => {
+  db.query("SELECT * FROM departments", function (err, result) {
+    if (err) {
+      console.log(err);
+    }
+    console.log(result);
+  });
+};
 // TODO: add function/ prompt for view all roles
-
+const viewRoles = () => {};
 // TODO: add function/ prompt for view all employees
-
+const viewEmployees = () => {};
 // TODO: add function/ prompt for add a department
-
+const addDepartment = () => {};
 // TODO: add function/ prompt for add a role
-
+const addRole = () => {};
 // TODO: add function/ prompt for add an employee
+const addEmployee = () => {};
 
 // TODO: add function/ prompt for updating an employee
+const updateEmployee = () => {};
 
+// Initialize application
 initialPrompt();
