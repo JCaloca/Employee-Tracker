@@ -62,15 +62,59 @@ const viewDepartments = () => {
     if (err) {
       console.log(err);
     }
-    console.log(result);
+    console.table(result);
+    initialPrompt();
   });
 };
 // TODO: add function/ prompt for view all roles
-const viewRoles = () => {};
+const viewRoles = () => {
+  db.query("SELECT * FROM roles", function (err, result) {
+    if (err) {
+      console.log(err);
+    }
+    console.table(result);
+    initialPrompt();
+  });
+};
 // TODO: add function/ prompt for view all employees
-const viewEmployees = () => {};
+const viewEmployees = () => {
+  db.query("SELECT * FROM employee", function (err, result) {
+    if (err) {
+      console.log(err);
+    }
+    console.table(result);
+    initialPrompt();
+  });
+};
 // TODO: add function/ prompt for add a department
-const addDepartment = () => {};
+// function createDepartment(department) {
+//   return db.promise().query("INSERT INTO departments ?", department);
+// }
+// // [req.params.genre]
+// const addDepartment = () => {
+//   inquirer
+//     .prompt([
+//       {
+//         type: "input",
+//         name: "department_name",
+//         message: "What is the department name?",
+//       },
+//     ])
+//     .then((answer) => {
+//       // var dept = answer.department_name;
+//       // db.query(("INSERT INTO departments SET ?", dept), function (err, result) {
+//       //   if (err) {
+//       //     console.log(err);
+//       //   } else console.log("Department successfully added!");
+//       // });
+//       // console.log(answer.department_name);
+//       createDepartment(answer.department_name)
+//         .then(() => {
+//           console.log("Added Department to table.");
+//         })
+//         .then(() => initialPrompt());
+//     });
+// };
 // TODO: add function/ prompt for add a role
 const addRole = () => {};
 // TODO: add function/ prompt for add an employee
