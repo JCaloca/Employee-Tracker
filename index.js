@@ -49,7 +49,7 @@ const initialPrompt = () => {
       } else if (userChoice === "Add an employee") {
         addEmployee();
       } else if (userChoice === "Update an employee role") {
-        updateEmployee();
+        updateEmployeeRole();
       } else if (userChoice === "Exit") {
         exit();
       }
@@ -68,23 +68,31 @@ const viewDepartments = () => {
 };
 // TODO: add function/ prompt for view all roles
 const viewRoles = () => {
-  db.query("SELECT * FROM roles", function (err, result) {
-    if (err) {
-      console.log(err);
+  db.query(
+    "SELECT roles.id, roles.title, departments.department_name, roles.salary FROM roles JOIN departments ON roles.department_id = departments.id",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+      }
+      console.table(result);
+      initialPrompt();
     }
-    console.table(result);
-    initialPrompt();
-  });
+  );
 };
 // TODO: add function/ prompt for view all employees
+// WHEN I choose to view all employees
+// THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
 const viewEmployees = () => {
-  db.query("SELECT * FROM employee", function (err, result) {
-    if (err) {
-      console.log(err);
+  db.query(
+    "SELECT employee.id, employee.first_name, employee.last_name, roles.title, departments.department_name AS department, roles.salary, manager.first_name  AS manager FROM employee JOIN roles ON employee.role_id = roles.id JOIN departments ON department_id = departments.id LEFT JOIN employee manager ON employee.manager_id = manager.id",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+      }
+      console.table(result);
+      initialPrompt();
     }
-    console.table(result);
-    initialPrompt();
-  });
+  );
 };
 // TODO: add function/ prompt for add a department
 const addDepartment = () => {
@@ -103,12 +111,101 @@ const addDepartment = () => {
     });
 };
 // TODO: add function/ prompt for add a role
-const addRole = () => {};
+const addRole = () => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "title",
+        message: "What is the role's title?",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is the salary of the role?",
+      },
+      {
+        type: "input",
+        name: "department_id",
+        message: "What is the department id?",
+      },
+    ])
+    .then((role) => {
+      db.query("INSERT INTO roles SET ?", role);
+      console.log("New role added!");
+      viewRoles();
+    });
+};
 // TODO: add function/ prompt for add an employee
-const addEmployee = () => {};
+const addEmployee = () => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "first_name",
+        message: "What is the employee's first name?",
+      },
+      {
+        type: "input",
+        name: "last_name",
+        message: "What is the employee's last name?",
+      },
+      {
+        type: "input",
+        name: "role_id",
+        message: "What is the role id?",
+      },
+      {
+        type: "input",
+        name: "manager_id",
+        message: "What is the manager id?",
+      },
+    ])
+    .then((employee) => {
+      db.query("INSERT INTO employee SET ?", employee);
+      console.log("New employee added!");
+      viewEmployees();
+    });
+};
 
 // TODO: add function/ prompt for updating an employee
-const updateEmployee = () => {};
+const updateEmployeeRole = () => {
+  db.query(
+    `SELECT id AS value, CONCAT(first_name, " ",last_name) AS name FROM employee`,
+    (err, employee) => {
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "id",
+            message: "What employee would you like to update?",
+            choices: employee,
+          },
+        ])
+        .then((id) => {
+          console.log(id);
+          db.query(
+            `SELECT id AS value, title AS name FROM roles`,
+            (err, roles) => {
+              inquirer
+                .prompt([
+                  {
+                    type: "list",
+                    name: "role_id",
+                    message: "What is the new role?",
+                    choices: roles,
+                  },
+                ])
+                .then((role_id) => {
+                  db.query("UPDATE employee SET ? WHERE ?", [role_id, id]);
+                })
+                .then(viewEmployees);
+            }
+          );
+        });
+    }
+  );
+};
 
 // Initialize application
 initialPrompt();
